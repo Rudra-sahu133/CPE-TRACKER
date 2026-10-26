@@ -23,7 +23,7 @@ COOKIE_SAME_SITE=lax
 ```
 
 `FRONTEND_ORIGINS` accepts a comma-separated allowlist of exact origins. In production, set it to the deployed frontend origin or origins. If it is unset in production, browser cross-origin requests are denied.
-Set `AUTH_CSRF_SECRET` to a private random value of at least 32 characters. Do not commit `.env`. `COOKIE_SAME_SITE` defaults to `lax`; use `none` only when the frontend and API are cross-site, and serve both over HTTPS (the cookie is then Secure).
+Set `AUTH_CSRF_SECRET` to a private random value of at least 32 characters. Do not commit `.env`. For the Vercel deployment, browser API calls use the frontend's same-origin `/api` proxy, so keep `COOKIE_SAME_SITE=lax`; `NODE_ENV=production` makes the cookie Secure. Use `none` only for an intentionally direct cross-site browser API deployment, over HTTPS.
 
 ## Run
 

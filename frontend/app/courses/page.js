@@ -7,7 +7,7 @@ import EmptyState from "@/components/ui/empty-state";
 import { apiFetch } from "@/components/auth/api-fetch";
 import { useAuth } from "@/components/auth/auth-provider";
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api").replace(/\/+$/, "");
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || "/api").replace(/\/+$/, "");
 const EMPTY_FORM = { title: "", provider: "", profession: "", credits: "" };
 const PROFESSION_OPTIONS = ["CPA", "Attorney", "Both"];
 

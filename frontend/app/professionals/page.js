@@ -8,7 +8,7 @@ import { apiFetch } from "@/components/auth/api-fetch";
 import { useAuth } from "@/components/auth/auth-provider";
 
 const STATUS_OPTIONS = ["Active", "Expiring soon", "Expired"];
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api").replace(/\/+$/, "");
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || "/api").replace(/\/+$/, "");
 const EMPTY_FORM = {
   name: "",
   email: "",
