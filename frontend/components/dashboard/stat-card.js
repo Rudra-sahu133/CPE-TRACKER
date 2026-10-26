@@ -1,0 +1,3 @@
+export default function StatCard({ label, value, change, detail, accent }) {
+  return <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-panel"><div className="flex items-start justify-between gap-3"><p className="text-[13px] font-medium text-slate-500">{label}</p><span className={`rounded-md px-2 py-1 text-[10px] font-semibold ${accent}`}>{detail}</span></div><div className="mt-4 flex items-end gap-2"><p className="text-[28px] font-semibold leading-none tracking-tight text-ink">{value}</p><p className="pb-0.5 text-xs font-medium text-emerald-600">{change}</p></div><div className="mt-4 h-1 rounded-full bg-slate-100"><div className="h-full w-[68%] rounded-full bg-brand-500"/></div></article>;
+}
