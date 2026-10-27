@@ -85,7 +85,7 @@ export function AuthProvider({ children }) {
     }
   }, [csrfToken]);
 
-  const value = useMemo(() => ({ user, status, sessionError, authenticate, logout }), [user, status, sessionError, authenticate, logout]);
+  const value = useMemo(() => ({ user, csrfToken, status, sessionError, authenticate, logout }), [user, csrfToken, status, sessionError, authenticate, logout]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
