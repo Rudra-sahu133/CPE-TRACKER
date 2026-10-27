@@ -25,5 +25,6 @@ Set `BACKEND_API_URL` to `https://cpe-tracker-backend.onrender.com/api` and `NEX
 - `/licenses` — Licenses
 - `/certificates` — Certificates
 - `/audit-logs` — Audit Logs
+- `/admin` — Operations overview for administrator and operations roles; includes account management only for administrators.
 
-Dashboard figures and activity are sample layout content. Professionals are loaded from MongoDB through the backend. No license or certificate is verified by this frontend.
+Dashboard figures and activity are sample layout content. The `/admin` metrics are loaded from MongoDB and count users plus owner-scoped Professional/Course records; operations accounts see aggregates only. Professionals and courses are loaded from MongoDB through the backend. Licenses and certificates remain placeholders and are not verified by this frontend.

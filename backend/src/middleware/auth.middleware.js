@@ -17,11 +17,11 @@ export async function requireSession(request, _response, next) {
     if (!token || token.length > 256) return next(unauthorized());
     const session = await Session.findOne({ tokenHash: hashToken(token), expiresAt: { $gt: new Date() } }).select("+tokenHash");
     if (!session) return next(unauthorized());
-    const user = await User.findById(session.userId).select("name email").lean();
+    const user = await User.findById(session.userId).select("name email role").lean();
     if (!user) return next(unauthorized());
     request.authSession = session;
     request.authToken = token;
-    request.authUser = { id: user._id.toString(), name: user.name, email: user.email };
+    request.authUser = { id: user._id.toString(), name: user.name, email: user.email, role: user.role || "user" };
     return next();
   } catch {
     const error = new Error("Session could not be verified. Please try again.");
@@ -43,6 +43,15 @@ export function requireSessionCsrf(request, _response, next) {
   const error = new Error("CSRF validation failed. Refresh and try again.");
   error.status = 403;
   return next(error);
+}
+
+export function requireRole(...roles) {
+  return function authorizeRole(request, _response, next) {
+    if (request.authUser && roles.includes(request.authUser.role)) return next();
+    const error = new Error("You do not have permission to perform this action.");
+    error.status = request.authUser ? 403 : 401;
+    return next(error);
+  };
 }
 
 function unauthorized() {

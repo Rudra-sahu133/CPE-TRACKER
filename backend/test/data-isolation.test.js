@@ -82,7 +82,7 @@ test("session middleware derives identity from the verified server-side session"
   let middlewareError;
   await requireSession(request, {}, (error) => { middlewareError = error; });
   assert.equal(middlewareError, undefined);
-  assert.deepEqual(request.authUser, { id: userA, name: "User A", email: "a@example.com" });
+  assert.deepEqual(request.authUser, { id: userA, name: "User A", email: "a@example.com", role: "user" });
 });
 
 test("current-session endpoint scopes the cookie to all API routes and clears the legacy path", async () => {

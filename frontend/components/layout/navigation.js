@@ -4,5 +4,6 @@ export const navigation = [
   { label: "Courses", href: "/courses", icon: "courses" },
   { label: "Licenses", href: "/licenses", icon: "license" },
   { label: "Certificates", href: "/certificates", icon: "certificate" },
-  { label: "Audit Logs", href: "/audit-logs", icon: "audit" },
+  { label: "Admin Panel", href: "/admin", icon: "dashboard", roles: ["admin", "operations"] },
+  { label: "Audit Logs", href: "/audit-logs", icon: "audit", roles: ["admin"] },
 ];

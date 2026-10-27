@@ -44,7 +44,7 @@ npm run dev
 
 Registration normalizes email to lowercase, validates the email, and requires a password of at least 12 characters (up to 72 UTF-8 bytes). Only a bcrypt hash is stored. Session IDs are random, stored hashed in MongoDB, expire after seven days, and are sent in an HttpOnly cookie. The cookie is SameSite Lax by default, Secure in production, and scoped to `/api` so it reaches both auth and business endpoints. A session check also upgrades the previous `/api/auth` cookie path and clears the old cookie. State-changing auth requests require a CSRF token in `X-CSRF-Token`; the session endpoint provides the session-bound CSRF token. CORS allows credentials only for exact configured frontend origins. Login attempts are limited to 10 per IP per 15-minute window in this single-process implementation.
 
-**Phase 1 limitation:** The frontend redirects unauthenticated users away from workspace pages, but the existing Professionals and Courses APIs remain unauthenticated and their records are not owner-scoped, as required for this phase. Do not expose this deployment as a multi-user data-isolated application until Phase 2 adds backend authentication and per-user ownership checks to every business API. Existing records are not migrated or assigned to users.
+New registrations receive the standard `user` role. Existing accounts without a stored role are treated as standard users. The verified session response contains the account role; the session cookie, server-side session lookup, CSRF checks, and owner-scoped Professional/Course APIs remain required.
 
 ## Health endpoint
 
@@ -73,5 +73,32 @@ Existing documents without an `owner` are deliberately preserved and are exclude
 The old Professional schema had a globally unique `email` index. The new schema defines a unique `{ owner: 1, email: 1 }` index so separate accounts can manage professionals with the same email. Before expecting that behavior, verify the new compound index exists, then manually drop the old `email_1` index from the `professionals` collection. Do not drop the old index until the replacement is confirmed. This index operation preserves documents; it is not performed automatically by the application. Course indexes are created from the owner and creation date fields.
 
 There are no update or delete business routes at this phase. Any future record-by-ID endpoint must query by both `_id` and the authenticated `owner`.
+
+## Administrative access
+
+Roles are `user`, `operations`, and `admin`. Standard accounts cannot grant themselves roles. Operations users can read aggregate account, owned Professional, and owned Course counts from `GET /api/admin/overview`; they cannot list users, individual business records, or audit events. Administrators can list safe account fields, assign or remove the `operations` role, and read administrative audit events. The role-management API accepts only `user` or `operations`, prevents self-role changes, and cannot create another administrator. Role changes and bootstrap are written to the audit log in the same MongoDB transaction as the change.
+
+### Bootstrap the first administrator
+
+First create and verify a normal account through the application. Then, from an authorized Render Shell in the `backend` directory (or a trusted local shell configured with the production database credentials), run once:
+
+```bash
+npm run admin:bootstrap -- administrator@example.com
+```
+
+The command uses the existing `MONGODB_URI`, requires that the email already belongs to an account, refuses to run if an administrator or prior bootstrap marker exists, sets only that account's role, and writes an audit event. The marker and role change are committed in one transaction to prevent concurrent or repeated bootstrap. It accepts no password or token and prints no database connection details. Do not add credentials to source code or frontend/Vercel variables. Only an operator with authorized Render Shell/database access should run it.
+
+To grant Operations access after signing in as the administrator, use **Operations** in the Admin panel, find the existing account, select **operations**, and confirm. This action is server-authorized and audited. Revoke it by selecting **user**. Administrator roles cannot be granted through the UI/API.
+
+No new environment variables are required. The existing Render `MONGODB_URI`, `AUTH_CSRF_SECRET`, cookie configuration, and Vercel same-origin `/api` proxy remain in use. No production migration or deployment is performed by this change.
+
+Administrative routes:
+
+- `GET /api/admin/overview` — admin/operations aggregate counts only.
+- `GET /api/admin/users` — admin-only searchable, role-filtered, paginated account list; returns name, email, role, and creation date only.
+- `PATCH /api/admin/users/:userId/role` — admin-only, session-CSRF-protected assignment of `user` or `operations`.
+- `GET /api/admin/audit-logs` — admin-only, paginated bootstrap and role-change history.
+
+The Admin panel does not expose Professional/Course documents across owners. License and Certificate modules remain placeholders because no corresponding persisted models or APIs exist. Existing dashboard sample cards and activity remain outside this admin implementation and should not be used as operational reports.
 
 Run `npm test` for API boundary, ownership-query/controller, schema, forged-owner, and validation regression tests. The multi-user tests use isolated in-memory fixtures; they do not connect to Atlas or write database records.

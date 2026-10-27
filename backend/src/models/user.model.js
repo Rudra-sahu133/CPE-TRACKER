@@ -4,6 +4,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true, minlength: 1, maxlength: 100 },
   email: { type: String, required: true, trim: true, lowercase: true, maxlength: 254, unique: true, index: true },
   passwordHash: { type: String, required: true, select: false },
+  role: { type: String, enum: ["user", "operations", "admin"], default: "user", required: true, index: true },
 }, { timestamps: true, versionKey: false });
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);

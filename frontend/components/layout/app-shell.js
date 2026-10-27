@@ -15,7 +15,9 @@ export default function AppShell({ children }) {
   const menuButtonRef = useRef(null);
   const closeButtonRef = useRef(null);
   const dialogRef = useRef(null);
-  const title = navigation.find((item) => item.href === pathname)?.label ?? "Dashboard";
+  const title = pathname === "/admin" && user?.role === "operations"
+    ? "Operations"
+    : navigation.find((item) => item.href === pathname)?.label ?? "Dashboard";
   const isAuthPage = pathname === "/login" || pathname === "/signup";
 
   useEffect(() => {
